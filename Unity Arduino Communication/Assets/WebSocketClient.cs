@@ -25,7 +25,7 @@ public class WebSocketClient : MonoBehaviour
 
     //Audio
     public AudioSource src;
-    public AudioClip Hurt, GunShoot, Dead;
+    public AudioClip Hurt;
 
     //Health System
     private int maxHealth = 10;
@@ -157,7 +157,7 @@ public class WebSocketClient : MonoBehaviour
 
         while (timer < 1f) // fade the intro panel Alpha
         {
-            timer += Time.deltaTime / 2f; //devide by 5 means that the loop runs for 5s in total
+            timer += Time.deltaTime / 2.5f; //devide by 5 means that the loop runs for 5s in total
 
             introPanel.alpha = Mathf.Lerp (1f, 0f, timer);
 
