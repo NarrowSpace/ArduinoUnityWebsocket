@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using UnityEngine.SocialPlatforms.Impl;
+using System.Threading;
 
 
 // UnityMainThreadDispatcher library: https://github.com/PimDeWitte/UnityMainThreadDispatcher
@@ -11,15 +12,25 @@ using UnityEngine.SocialPlatforms.Impl;
 public class WebSocketClient : MonoBehaviour
 {
     WebSocket ws;
+
+    //Score
     private int myScore = 0;
     private int prevScore = -1; // set to -1 initially to ensure animation triggers on first score update
     public Text myScoreText;
+
+    //Animator
     public Animator manAnimator;
-    private bool isAnimationTriggered = false;
     public Animator monsterAnimator;
 
+    //Audio
     public AudioSource src;
     public AudioClip Hurt;
+
+    //Health System
+    private int maxHealth = 10;
+    private bool isMonsterDead = false;
+    public Image[] hearts; 
+
 
     private void Awake()
     {
@@ -48,38 +59,50 @@ public class WebSocketClient : MonoBehaviour
             // Converts a JSON string into an object of the specified type
             ScoreData scoreData = JsonUtility.FromJson<ScoreData>(jsonData);
             myScore = scoreData.Counter;
-            Debug.Log("Score: " + myScore);
+            Debug.Log("My score is " + myScore);
+
+            //Monster Health System
+            int currentHealth = maxHealth - myScore;
 
             // Update in the Main Thread
             UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
-                myScoreText.text = "Score: " + myScore.ToString();
+                myScoreText.text = "x " + myScore.ToString();
 
                 if (myScore != prevScore) //Trigger GunMan Animation
                 {
                     if (prevScore < myScore && prevScore != -1 && (myScore - prevScore) == 1)
                     {
                         manAnimator.SetTrigger("Shoot");
-
                         monsterAnimator.SetTrigger("GetHit");
-
-                       src.clip = Hurt;
-
+                        src.clip = Hurt;
                         src.Play();
 
-                        isAnimationTriggered = true;
+                        //Monster Heart Sprite
+                        if (currentHealth < 10 && currentHealth > 0)
+                        {
+                          hearts[currentHealth].enabled = false;
+                          isMonsterDead = false;
+                        }
 
-                        Debug.Log("Shoot!");
+                        if (currentHealth == 0)
+                        {
+                            hearts[currentHealth].enabled = false;
+                            isMonsterDead= true;
+                            monsterAnimator.SetTrigger("Dead");
+                            Debug.Log("I'm Deeeeeeeeeeaaaaaddddd!!");
+                        }
 
+                        Debug.Log("CurrentHealth" + currentHealth);
                     }
 
-                    else if (prevScore > myScore || prevScore == myScore || prevScore == 0)
+                    else if (myScore == 0 && prevScore != myScore)
                     {
-                        isAnimationTriggered = false;
+                        Debug.Log ("Restart!");
                     }
                 }
 
-               prevScore = myScore; //Update the score
+                prevScore = myScore; //Update the score
 
             });
         }
@@ -90,6 +113,7 @@ public class WebSocketClient : MonoBehaviour
             Debug.LogError("Error parsing score data: " + e.Message);
         }
     }
+
 
     public void Update()
     {
