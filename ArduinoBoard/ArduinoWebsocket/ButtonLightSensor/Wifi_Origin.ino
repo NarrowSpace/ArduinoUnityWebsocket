@@ -1,3 +1,4 @@
+
 /*
 This project is using Glitch Websocket
 */
@@ -41,9 +42,15 @@ int sensorVal;
 int countVal = 0;
 int currentState = 0;
 int preState = 0;
+//Button
+int bntPin = 3;
+bool currentBntState;
+bool preBtnState;
+
 
 void setup() {
   Serial.begin(9600);
+  pinMode(bntPin, INPUT_PULLUP);
 
   String printConnection = "CONNECT " + String(ssid);
 
@@ -72,40 +79,42 @@ void loop() {
     if (millis() - lastSend > interval) {
 
       sensorVal = analogRead(sensorPin);
+      currentBntState = digitalRead(bntPin);
 
-      if (sensorVal > 950) {
-        currentState = 1;
-        delay(3000);
-      }
-
-      else {
-        currentState = 0;
-      }
-
-      if (currentState != preState) {
-
-        if (currentState == 1) {
-          countVal++;
-          Serial.println(countVal);
+      if (currentBntState == HIGH && preBtnState == LOW) {
+        // Button is just pressed, reset the counter
+        countVal = 0;
+      } else {
+        // Button is not pressed or has been pressed before
+        if (sensorVal > 950) {
+          currentState = 1;
+          delay(3000);
+        } else {
+          currentState = 0;
         }
+
+        if (currentState != preState && currentBntState == LOW) {
+          if (currentState == 1) {
+            countVal++;
+          }
+        }
+        //save the data into your JSON Object
+        //the parameter names you create are important
+        //these names are how you will retrieve the data when read from the server
+        socketDataSend["id"] = dataID;
+        // socketDataSend["sensor"] = sensorVal;
+        socketDataSend["Counter"] = countVal;
+
+        String message;                          //create variable to hold message
+        serializeJson(socketDataSend, message);  //convert the JSON object to a String
+
+        // send the message:
+        client.beginMessage(TYPE_TEXT);
+        client.print(message);
+        client.endMessage();
+        // update the timestamp:
+        lastSend = millis();
       }
-
-      //save the data into your JSON Object
-      //the parameter names you create are important
-      //these names are how you will retrieve the data when read from the server
-      socketDataSend["id"] = dataID;
-      // socketDataSend["sensor"] = sensorVal;
-      socketDataSend["Counter"] = countVal;
-
-      String message;                          //create variable to hold message
-      serializeJson(socketDataSend, message);  //convert the JSON object to a String
-
-      // send the message:
-      client.beginMessage(TYPE_TEXT);
-      client.print(message);
-      client.endMessage();
-      // update the timestamp:
-      lastSend = millis();
     }
 
     // check if a message is available to be received
@@ -114,22 +123,6 @@ void loop() {
     if (messageSize > 0) {
       Serial.println("Received a message:");
       Serial.println(client.readString());
-
-      /* Since the project Only with One Arduino direct talk to Unity
-      so the following code will not be excuted
-
-      // DeserializationError error = deserializeJson(socketDataReceive, client);
-      // if (!error) {
-      //   //get the id
-      //   String messageID = socketDataReceive["id"];
-
-      //   if (messageID != dataID) {
-      //     Serial.println("Received new message: ");
-      //   } else {
-      //     Serial.println("I sent this message, Go check it!");
-      //   }
-      // }
-    } */
     }
   }
 
