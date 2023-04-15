@@ -36,6 +36,14 @@ public class WebSocketClient : MonoBehaviour
     public CanvasGroup introPanel;
     public CanvasGroup winPanel;
 
+    [SerializeField]
+    private WeaponParticle gunParticle;
+
+    [SerializeField]
+    private string monsterTag;
+
+    private bool gunShoot = false;
+
     private void Awake()
     {
         manAnimator = GameObject.Find("GunMan").GetComponent<Animator>();
@@ -57,6 +65,9 @@ public class WebSocketClient : MonoBehaviour
         // Set initial states of panels
         introPanel.gameObject.SetActive(true);
         winPanel.gameObject.SetActive(false);
+
+        // Particle system
+        gunParticle.SetEnemyTag(monsterTag);
     }
 
 
@@ -84,6 +95,9 @@ public class WebSocketClient : MonoBehaviour
                 {
                     if (prevScore < myScore && prevScore != -1 && (myScore - prevScore) == 1)
                     {
+                        gunShoot = true;
+                        gunParticle.Fire();
+
                         manAnimator.SetTrigger("Shoot");
                         monsterAnimator.SetTrigger("GetHit");
                         PlaySoundHurt();
@@ -132,7 +146,6 @@ public class WebSocketClient : MonoBehaviour
         src.Play();
     }
 
-
     public void Update()
     {
         if (ws == null) return;
@@ -157,7 +170,7 @@ public class WebSocketClient : MonoBehaviour
 
         while (timer < 1f) // fade the intro panel Alpha
         {
-            timer += Time.deltaTime / 2.5f; //devide by 5 means that the loop runs for 5s in total
+            timer += Time.deltaTime / 3.3f; //devide by 3 means that the loop runs for 3s in total
 
             introPanel.alpha = Mathf.Lerp (1f, 0f, timer);
 
