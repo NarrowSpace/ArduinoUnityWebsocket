@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System;
 using UnityEngine.SocialPlatforms.Impl;
 using System.Threading;
+using System.Collections;
 
 
 // UnityMainThreadDispatcher library: https://github.com/PimDeWitte/UnityMainThreadDispatcher
@@ -24,13 +25,16 @@ public class WebSocketClient : MonoBehaviour
 
     //Audio
     public AudioSource src;
-    public AudioClip Hurt;
+    public AudioClip Hurt, GunShoot, Dead;
 
     //Health System
     private int maxHealth = 10;
     private bool isMonsterDead = false;
-    public Image[] hearts; 
+    public Image[] hearts;
 
+    //Canvas
+    public CanvasGroup introPanel;
+    public CanvasGroup winPanel;
 
     private void Awake()
     {
@@ -49,7 +53,12 @@ public class WebSocketClient : MonoBehaviour
         };
 
         ws.Connect();
+
+        // Set initial states of panels
+        introPanel.gameObject.SetActive(true);
+        winPanel.gameObject.SetActive(false);
     }
+
 
     private void UpdateScore(string jsonData)
     {
@@ -69,15 +78,16 @@ public class WebSocketClient : MonoBehaviour
             {
                 myScoreText.text = "x " + myScore.ToString();
 
+                StartCoroutine(ShowVsUI());
+
                 if (myScore != prevScore) //Trigger GunMan Animation
                 {
                     if (prevScore < myScore && prevScore != -1 && (myScore - prevScore) == 1)
                     {
                         manAnimator.SetTrigger("Shoot");
                         monsterAnimator.SetTrigger("GetHit");
-                        src.clip = Hurt;
-                        src.Play();
-
+                        PlaySoundHurt();
+ 
                         //Monster Heart Sprite
                         if (currentHealth < 10 && currentHealth > 0)
                         {
@@ -91,6 +101,7 @@ public class WebSocketClient : MonoBehaviour
                             isMonsterDead= true;
                             monsterAnimator.SetTrigger("Dead");
                             Debug.Log("I'm Deeeeeeeeeeaaaaaddddd!!");
+                            StartCoroutine(ShowWinUI());
                         }
 
                         Debug.Log("CurrentHealth" + currentHealth);
@@ -115,6 +126,13 @@ public class WebSocketClient : MonoBehaviour
     }
 
 
+    private void PlaySoundHurt()
+    {
+        src.clip = Hurt;
+        src.Play();
+    }
+
+
     public void Update()
     {
         if (ws == null) return;
@@ -131,6 +149,40 @@ public class WebSocketClient : MonoBehaviour
     {
         // public string id;
         public int Counter;
+    }
+
+    public IEnumerator ShowVsUI()
+    {
+        float timer = 0f;
+
+        while (timer < 1f) // fade the intro panel Alpha
+        {
+            timer += Time.deltaTime / 2f; //devide by 5 means that the loop runs for 5s in total
+
+            introPanel.alpha = Mathf.Lerp (1f, 0f, timer);
+
+            yield return null;
+        }
+
+        introPanel.gameObject.SetActive(false);
+    }
+
+    public IEnumerator ShowWinUI()
+    {
+        float timer = 0f;
+
+        while (timer < 1f) // fade the intro panel Alpha
+        {
+            timer += Time.deltaTime / 1f; //devide by 5 means that the loop runs for 5s in total
+
+            winPanel.alpha = Mathf.Lerp (0f, 1f, timer);
+
+            Debug.Log("Title Ends! Game Begin!");
+
+            yield return null;
+        }
+
+        winPanel.gameObject.SetActive(true);
     }
 
 
