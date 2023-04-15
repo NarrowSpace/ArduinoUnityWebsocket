@@ -1213,7 +1213,7 @@ RectTransform:
   m_GameObject: {fileID: 132005621}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.096176766, y: 0.062013976, z: 0.038476296}
+  m_LocalScale: {x: 0.08937611, y: 0.057628967, z: 0.035755638}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 550070908}
@@ -1776,7 +1776,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myScoreText: {fileID: 1187387714}
   manAnimator: {fileID: 1691574029}
-  monsterAnimator: {fileID: 1630521023}
+  monsterCtrl: {fileID: 1630521023}
   src: {fileID: 170922399}
   Hurt: {fileID: 8300000, guid: 9fcf15fbba850774eaf3da9486e10585, type: 3}
   hearts:
@@ -16901,6 +16901,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fireRate: 0.4
+  monsterAnimator: {fileID: 1630521023}
 --- !u!1001 &1994525081
 PrefabInstance:
   m_ObjectHideFlags: 0

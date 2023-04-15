@@ -14,10 +14,14 @@ public class WeaponParticle : MonoBehaviour
 
     private string monsterTag;
 
+    public Animator monsterAnimator;
+
+
     void Start()
     {
         particleSystem = GetComponent<ParticleSystem>();
         particleCollision = new List<ParticleCollisionEvent>();
+        monsterAnimator = GameObject.Find("Monster").GetComponent<Animator>();
     }
 
     void OnParticleCollision(GameObject other)
@@ -31,6 +35,7 @@ public class WeaponParticle : MonoBehaviour
             if (collider.CompareTag(monsterTag))
             {
                 Debug.Log("Hit Monster!");
+                monsterAnimator.SetTrigger("GetHit");
             }
         }
     }
@@ -53,4 +58,5 @@ public class WeaponParticle : MonoBehaviour
         yield return new WaitForSeconds(fireRate);
         fireCoolDown = false;
     }
+
 }

@@ -21,7 +21,7 @@ public class WebSocketClient : MonoBehaviour
 
     //Animator
     public Animator manAnimator;
-    public Animator monsterAnimator;
+    public Animator monsterCtrl;
 
     //Audio
     public AudioSource src;
@@ -47,7 +47,7 @@ public class WebSocketClient : MonoBehaviour
     private void Awake()
     {
         manAnimator = GameObject.Find("GunMan").GetComponent<Animator>();
-        monsterAnimator = GameObject.Find("Monster").GetComponent<Animator>();
+       // monsterAnimator = GameObject.Find("Monster").GetComponent<Animator>();
     }
 
     void Start()
@@ -99,7 +99,6 @@ public class WebSocketClient : MonoBehaviour
                         gunParticle.Fire();
 
                         manAnimator.SetTrigger("Shoot");
-                        monsterAnimator.SetTrigger("GetHit");
                         PlaySoundHurt();
  
                         //Monster Heart Sprite
@@ -113,7 +112,9 @@ public class WebSocketClient : MonoBehaviour
                         {
                             hearts[currentHealth].enabled = false;
                             isMonsterDead= true;
-                            monsterAnimator.SetTrigger("Dead");
+
+                            monsterCtrl.SetTrigger("Dead");
+                            //monsterAnimator.SetTrigger("Dead");
                             Debug.Log("I'm Deeeeeeeeeeaaaaaddddd!!");
                             StartCoroutine(ShowWinUI());
                         }
@@ -140,7 +141,7 @@ public class WebSocketClient : MonoBehaviour
     }
 
 
-    private void PlaySoundHurt()
+    public void PlaySoundHurt()
     {
         src.clip = Hurt;
         src.Play();
