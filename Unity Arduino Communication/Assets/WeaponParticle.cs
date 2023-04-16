@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WeaponParticle : MonoBehaviour
 {
@@ -16,6 +17,13 @@ public class WeaponParticle : MonoBehaviour
 
     public Animator monsterAnimator;
 
+    private int counter = 10;
+
+    public Image[] hearts;
+
+    public AudioSource hitSrc;
+    public AudioClip hitSound;
+
 
     void Start()
     {
@@ -28,13 +36,24 @@ public class WeaponParticle : MonoBehaviour
     {
         ParticlePhysicsExtensions.GetCollisionEvents(particleSystem, other, particleCollision);
 
-        for(int i = 0; i< particleCollision.Count; i++)
+        for(int i = 0; i < particleCollision.Count; i++)
         {
             var collider = particleCollision[i].colliderComponent;
 
             if (collider.CompareTag(monsterTag))
             {
-                Debug.Log("Hit Monster!");
+
+                hitSrc.clip = hitSound;
+                hitSrc.Play();
+
+                counter -- ;
+                Debug.Log("Counter" + counter);
+
+                if (counter < 10 && counter >= 0)
+                {
+                    hearts[counter].enabled = false;
+                }
+
                 monsterAnimator.SetTrigger("GetHit");
             }
         }

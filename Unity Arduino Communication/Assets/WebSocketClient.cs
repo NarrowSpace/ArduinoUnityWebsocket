@@ -25,12 +25,15 @@ public class WebSocketClient : MonoBehaviour
 
     //Audio
     public AudioSource src;
-    public AudioClip Hurt;
+    public AudioClip gunFire;
+
+    public AudioSource winUI;
+    public AudioClip winSound;
 
     //Health System
     private int maxHealth = 10;
     private bool isMonsterDead = false;
-    public Image[] hearts;
+    //public Image[] hearts;
 
     //Canvas
     public CanvasGroup introPanel;
@@ -104,19 +107,19 @@ public class WebSocketClient : MonoBehaviour
                         //Monster Heart Sprite
                         if (currentHealth < 10 && currentHealth > 0)
                         {
-                          hearts[currentHealth].enabled = false;
                           isMonsterDead = false;
                         }
 
                         if (currentHealth == 0)
                         {
-                            hearts[currentHealth].enabled = false;
                             isMonsterDead= true;
 
                             monsterCtrl.SetTrigger("Dead");
                             //monsterAnimator.SetTrigger("Dead");
                             Debug.Log("I'm Deeeeeeeeeeaaaaaddddd!!");
+                            //PlaySoundWin();
                             StartCoroutine(ShowWinUI());
+
                         }
 
                         Debug.Log("CurrentHealth" + currentHealth);
@@ -143,8 +146,14 @@ public class WebSocketClient : MonoBehaviour
 
     public void PlaySoundHurt()
     {
-        src.clip = Hurt;
+        src.clip = gunFire;
         src.Play();
+    }
+
+    public void PlaySoundWin()
+    {
+        winUI.clip = winSound;
+        winUI.Play();
     }
 
     public void Update()
@@ -197,6 +206,8 @@ public class WebSocketClient : MonoBehaviour
         }
 
         winPanel.gameObject.SetActive(true);
+        PlaySoundWin();
+        
     }
 
 
