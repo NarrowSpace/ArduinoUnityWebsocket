@@ -180,7 +180,7 @@ public class WebSocketClient : MonoBehaviour
 
         while (timer < 1f) // fade the intro panel Alpha
         {
-            timer += Time.deltaTime / 3.3f; //devide by 3 means that the loop runs for 3s in total
+            timer += Time.deltaTime / 3.3f; //devide by 3.3 means that the loop runs for 3.3s in total
 
             introPanel.alpha = Mathf.Lerp (1f, 0f, timer);
 
