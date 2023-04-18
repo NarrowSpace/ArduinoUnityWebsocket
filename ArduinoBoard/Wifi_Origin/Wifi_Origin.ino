@@ -7,6 +7,12 @@ This project is using Glitch Websocket
 #include <ArduinoHttpClient.h>
 #include <WiFiNINA.h>
 #include <ArduinoJson.h>
+#include <FastLED.h>
+
+//LED Strip Setup
+#define LED_PIN 11
+#define NUM_LEDS 50
+CRGB leds[NUM_LEDS];
 
 //Fill the wifi info in the 'arduino_secrets' file
 char ssid[] = SECRET_SSID;
@@ -34,7 +40,6 @@ StaticJsonDocument<300> socketDataReceive;
 //My Arduino Name
 String dataID = "WTArduino";
 
-
 //Arduino Part
 int sensorPin = A0;
 int sensorVal;
@@ -51,6 +56,12 @@ bool preBtnState;
 void setup() {
   Serial.begin(9600);
   pinMode(bntPin, INPUT_PULLUP);
+
+  //LED Setting
+  FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
+  FastLED.setMaxPowerInVoltsAndMilliamps(5, 500);
+  FastLED.clear();
+  FastLED.show();
 
   String printConnection = "CONNECT " + String(ssid);
 
@@ -88,9 +99,21 @@ void loop() {
         // Button is not pressed or has been pressed before
         if (sensorVal > 950) {
           currentState = 1;
-          delay(3000);
+          Serial.print("Sensor Value = ");
+          Serial.println(sensorVal);
+          delay(2000);
+          for (int i = 0; i < NUM_LEDS; i++) {
+            leds[i] = CRGB(255, 0, 0);
+            FastLED.setBrightness(100);
+            FastLED.show();
+          }
         } else {
           currentState = 0;
+          for (int i = 0; i < NUM_LEDS; i++) {
+            leds[i] = CRGB(255, 0, 0);
+            FastLED.setBrightness(0);
+            FastLED.show();
+          }
         }
 
         if (currentState != preState && currentBntState == LOW) {
